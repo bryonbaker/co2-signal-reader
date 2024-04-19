@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: carbon-intensity-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: carbon-intensity
+        image: quay.io/brbaker/co2-signal:latest
+        command:
+        - /bin/bash
+        - "-c"
+        - |
+            echo $CO2SIGNAL_API_KEY
+            exec /app/co2-signal-svc
+        imagePullPolicy: Always
+        env:
+        - name: DRYRUN
+          value: "--dry-run"
+        - name: CO2SIGNAL_API_KEY
+          value: "bDzD8ZgLmLh64oJjVCHiuaUJkHPDoAzh"
+        volumeMounts:
+        - name: config
+          mountPath: "/app/config"
+          readOnly: true
+      restartPolicy: Never
+      volumes:
+      - name: config
+        configMap:
+          name: co2signal-app-config
+          items:                  
+          - key: "kafka.properties"
+            path: "kafka.properties"
+          - key: "app-config.properties"
+            path: "app-config.properties"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: co2signal-app-config
+data:
+  kafka.properties: |
+    bootstrap.servers=os-climate-kafka-bootstrap.kafka.svc.cluster.local:9092
+    security.protocol=plaintext
+    acks=all
+  app-config.properties: |
+    data-publisher=kafka-publisher
+    data-source=co2-signal
+    reader=one-shot
+    kafka-stream=carbonintensity
+    kafka-topc=co2signal

@@ -1,0 +1,7 @@
+markets-pricing-service.code-workspace
+.vscode/launch.json
+samples/*
+unversioned-files/*
+sectrets/*
+bin/*
+co2-signal-reader.code-workspace
