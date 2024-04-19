@@ -5,3 +5,6 @@ unversioned-files/*
 sectrets/*
 bin/*
 co2-signal-reader.code-workspace
+# Credentials / Secrets
+credentials.env
+
